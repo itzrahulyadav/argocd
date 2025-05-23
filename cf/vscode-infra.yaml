@@ -1,0 +1,39 @@
+Resources:
+  myTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: instance
+      VpcId: vpc-09c473f0e177c4657
+      Protocol: HTTP
+      Port: 8080
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: my-alb
+      Type: application
+      Scheme: internet-facing
+      Subnets:
+        - subnet-08860e80be5542cc1
+        - subnet-00334308ee9207d0c
+        - subnet-025211a17a085733d
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref myTargetGroup
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.small
+      ImageId: ami-0e35ddab05955cf57
+      Tags:
+        - Key: Name
+          Value: VScode
+      IamInstanceProfile: Admin-role-for-EC2
