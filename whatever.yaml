@@ -30,12 +30,12 @@
 #         - Type: forward
 #           TargetGroupArn: !Ref myTargetGroup
 
-#   EC2Instance:
-#     Type: AWS::EC2::Instance
-#     Properties:
-#       InstanceType: t2.small
-#       ImageId: ami-0e35ddab05955cf57
-#       Tags:
-#         - Key: Name
-#           Value: VScode
-#       IamInstanceProfile: Admin-role-for-EC2
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.small
+      ImageId: ami-0e35ddab05955cf57
+      Tags:
+        - Key: Name
+          Value: VScode
+      IamInstanceProfile: Admin-role-for-EC2
