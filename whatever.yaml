@@ -1,4 +1,6 @@
-# Resources:
+ Resources:
+    mys3bucket:
+       Type: AWS::S3::Bucket
 #   myTargetGroup:
 #     Type: AWS::ElasticLoadBalancingV2::TargetGroup
 #     Properties:
