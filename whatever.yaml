@@ -1,1 +1,66 @@
+Parameters:
+  VPCId:
+    Type: String
+    Description: VPC ID for the load balancer
+    Default: vpc-09c473f0e177c4657
+  SubnetIds:
+    Type: CommaDelimitedList
+    Description: Comma-separated list of subnet IDs for the load balancer and ECS service
+    Default: [ subnet-025211a17a085733d,subnet-00334308ee9207d0c,subnet-08860e80be5542cc1 ]
+  SecurityGroupId:
+    Type: String
+    Description: Security group ID for the load balancer and ECS service
+    Default: [sg-0651cf36faef7ed5a]
+Resources:
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: abstraction-fe-alb
+      Subnets: !Ref SubnetIds
+      SecurityGroups:
+        - !Ref SecurityGroupId
+      Scheme: internet-facing
+      Type: application
 
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: abstraction-fe-tg
+      Port: 3000
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: !Ref VPCId
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: Abstraction
+      LaunchType: FARGATE
+      TaskDefinition: arn:aws:ecs:ap-south-1:533267257785:task-definition/abstraction-fe:75
+      DesiredCount: 1
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets: !Ref SubnetIds
+          SecurityGroups:
+            - sg-0be3f4c1b06ffda60
+          AssignPublicIp: ENABLED
+      LoadBalancers:
+        - ContainerName: abstraction-fe-container
+          ContainerPort: 3000
+          TargetGroupArn: !Ref TargetGroup
